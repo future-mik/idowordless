@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17152b">
+  <meta name="description" content="Discover ebooks, connect with writers, and sell your creative work on idowordless.">
+  <title>idowordless | A Marketplace for Words</title>
+
+  <style>
+    :root {
+      --dark: #17152b;
+      --purple: #7255d9;
+      --light-purple: #eeeaff;
+      --gold: #e6b85c;
+      --white: #ffffff;
+      --bg: #f7f7fb;
+      --muted: #77768a;
+      --border: #e8e7ef;
+      --green: #16845b;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; text-decoration: none; }
+
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .nav {
+      max-width: 1150px;
+      margin: auto;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .logo {
+      font-size: 25px;
+      font-weight: 900;
+      letter-spacing: -1.3px;
+      color: var(--dark);
+    }
+    .logo span { color: var(--purple); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+    .nav-links button {
+      border: 0;
+      background: none;
+      color: var(--dark);
+      font-weight: 600;
+    }
+    .nav-links button:hover { color: var(--purple); }
+    .nav-actions { display: flex; gap: 9px; align-items: center; }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 17px;
+      font-weight: 700;
+      background: var(--purple);
+      color: white;
+    }
+    .btn:hover { filter: brightness(.94); }
+    .btn-outline {
+      background: white;
+      color: var(--purple);
+      border: 1px solid var(--purple);
+    }
+    .btn-dark { background: var(--dark); }
+    .btn-small { padding: 8px 12px; font-size: 13px; }
+
+    main { min-height: 70vh; }
+    .container { max-width: 1150px; margin: auto; padding: 30px 20px; }
+
+    .hero {
+      background: linear-gradient(120deg, #201b42, #5741a6);
+      color: white;
+      padding: 75px 25px;
+      border-radius: 0 0 28px 28px;
+    }
+    .hero-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 35px;
+      align-items: center;
+    }
+    .eyebrow {
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(38px, 6vw, 65px);
+      line-height: 1.05;
+      margin: 14px 0;
+      letter-spacing: -2px;
+    }
+    .hero p {
+      color: #e5e1f7;
+      line-height: 1.7;
+      max-width: 570px;
+    }
+    .hero-buttons { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; }
+    .hero .btn-outline { background: transparent; color: white; border-color: #c8bdf5; }
+    .hero-art {
+      min-height: 230px;
+      display: grid;
+      place-items: center;
+      font-size: 115px;
+      background: #ffffff12;
+      border: 1px solid #ffffff25;
+      border-radius: 28px;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 15px;
+      margin: 35px 0 18px;
+    }
+    .section-heading h2 { margin: 0 0 6px; font-size: 26px; }
+    .section-heading p { margin: 0; color: var(--muted); font-size: 14px; }
+    .text-link { color: var(--purple); font-weight: 700; background: none; border: 0; }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+    .category {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 23px;
+      text-align: left;
+    }
+    .category .emoji { font-size: 30px; }
+    .category h3 { margin: 12px 0 6px; }
+    .category p { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.5; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .toolbar input, .toolbar select {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    .listing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .listing-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .cover {
+      height: 165px;
+      background: linear-gradient(135deg, #e8e1ff, #c8b9f6);
+      display: grid;
+      place-items: center;
+      font-size: 54px;
+      overflow: hidden;
+    }
+    .cover img { width: 100%; height: 100%; object-fit: cover; }
+    .listing-content { padding: 17px; display: flex; flex-direction: column; flex: 1; }
+    .tag {
+      display: inline-block;
+      background: var(--light-purple);
+      color: var(--purple);
+      border-radius: 30px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      width: fit-content;
+      text-transform: uppercase;
+    }
+    .listing-content h3 { margin: 12px 0 7px; font-size: 18px; }
+    .listing-content p {
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 13px;
+      margin: 0 0 13px;
+    }
+    .listing-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .price { font-weight: 800; color: var(--green); }
+    .byline { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+
+    .empty {
+      background: white;
+      border: 1px dashed #c9c5d9;
+      padding: 35px 20px;
+      border-radius: var(--radius);
+      color: var(--muted);
+      text-align: center;
+      grid-column: 1 / -1;
+    }
+
+    .page-title { margin-bottom: 8px; font-size: 32px; }
+    .page-subtitle { color: var(--muted); margin-top: 0; line-height: 1.6; }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 15px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-weight: 700; font-size: 13px; }
+    .field input, .field textarea, .field select {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      width: 100%;
+      background: white;
+    }
+    .field textarea { min-height: 100px; resize: vertical; }
+    .hint { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .stat {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 18px;
+      border-radius: 14px;
+    }
+    .stat strong { display: block; font-size: 25px; margin-top: 7px; }
+    .stat span { color: var(--muted); font-size: 13px; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: #17152b99;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow: auto;
+      position: relative;
+    }
+    .modal h2 { margin-top: 0; }
+    .close {
+      position: absolute;
+      right: 17px;
+      top: 13px;
+      background: none;
+      border: 0;
+      font-size: 25px;
+      color: var(--muted);
+    }
+    .modal-switch { color: var(--purple); background: none; border: 0; font-weight: 700; }
+    .notice { padding: 12px; border-radius: 10px; font-size: 13px; margin: 12px 0; display: none; }
+    .notice.error { display: block; background: #fff0f0; color: #a12828; }
+    .notice.success { display: block; background: #eaf8f1; color: #176b4a; }
+
+    .detail-cover {
+      height: 220px;
+      border-radius: 14px;
+      background: var(--light-purple);
+      display: grid;
+      place-items: center;
+      font-size: 75px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .detail-description { white-space: pre-wrap; line-height: 1.7; color: #55546a; }
+
+    footer {
+      background: var(--dark);
+      color: white;
+      padding: 35px 20px;
+      margin-top: 45px;
+    }
+    .footer-inner {
+      max-width: 1150px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    footer p { color: #c6c2d7; font-size: 13px; }
+
+    .menu-trigger {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border: 1px solid var(--border); background: #fff; color: var(--dark);
+      border-radius: 12px; padding: 8px 11px; font-weight: 700;
+    }
+    .menu-trigger .cat { font-size: 25px; line-height: 1; }
+    .nav { justify-content: flex-start; }
+    .nav-brand { display:flex; align-items:center; gap:13px; }
+    .nav-spacer { flex:1; }
+    .account-greeting { color:var(--dark); font-size:13px; font-weight:700; max-width:190px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .sidebar-backdrop { position:fixed; inset:0; z-index:60; background:rgba(15,12,30,.48); opacity:0; visibility:hidden; transition:.22s ease; }
+    .sidebar-backdrop.open { opacity:1; visibility:visible; }
+    .sidebar { position:fixed; z-index:61; top:0; left:0; bottom:0; width:min(310px,86vw); background:#fff; box-shadow:12px 0 40px #17152b24; transform:translateX(-105%); transition:transform .25s ease; padding:22px 18px; display:flex; flex-direction:column; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-head { display:flex; align-items:center; justify-content:space-between; padding-bottom:22px; border-bottom:1px solid var(--border); }
+    .sidebar-close { border:0; background:var(--bg); border-radius:10px; width:38px; height:38px; font-size:24px; color:var(--muted); }
+    .sidebar-caption { color:var(--muted); font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin:24px 10px 10px; }
+    .sidebar-links { display:grid; gap:7px; }
+    .sidebar-links button { border:0; background:transparent; text-align:left; border-radius:11px; padding:13px 12px; color:var(--dark); font-weight:700; display:flex; align-items:center; gap:12px; }
+    .sidebar-links button:hover, .sidebar-links button:focus { background:var(--light-purple); color:var(--purple); }
+    .sidebar-links .side-icon { width:25px; text-align:center; font-size:19px; }
+    .sidebar-note { margin-top:auto; background:#f5f2ff; border-radius:13px; padding:14px; color:#625b7b; font-size:12px; line-height:1.5; }
+
+    @media (max-width: 760px) {
+      .nav { flex-wrap: nowrap; padding:12px 14px; gap:10px; }
+      .logo { font-size:21px; }
+      .nav-actions { gap:6px; }
+      .account-greeting { display:none; }
+      .nav-actions .btn { padding:9px 10px; font-size:12px; }
+      .hero { padding:48px 20px; }
+      .hero-inner { grid-template-columns:1fr; }
+      .hero-art { min-height:130px; font-size:75px; }
+      .hero h1 { font-size: clamp(43px, 12vw, 62px); letter-spacing:-1.6px; }
+      .listing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .category-grid { grid-template-columns: 1fr; }
+      .dashboard-stats { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 440px) {
+      .listing-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .section-heading { align-items: start; flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="nav">
+      <div class="nav-brand">
+        <button class="menu-trigger" id="menuTrigger" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleSidebar(true)"><span class="cat">🐈📖</span><span>Menu</span></button>
+        <a href="#" class="logo" onclick="showPage('home');return false;">ido<span>wordless</span></a>
+      </div>
+      <div class="nav-spacer"></div>
+      <div class="nav-actions">
+        <span class="account-greeting" id="accountGreeting" hidden></span>
+        <button class="btn btn-outline btn-small" id="loginButton" onclick="openAuth('login')">Log in</button>
+        <button class="btn btn-small" id="signupButton" onclick="openAuth('signup')">Join free</button>
+        <button class="btn btn-dark btn-small" id="logoutButton" onclick="logout()" hidden>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)"></div>
+  <aside class="sidebar" id="siteSidebar" aria-label="Main navigation" aria-hidden="true">
+    <div class="sidebar-head">
+      <a href="#" class="logo" onclick="showPage('home');toggleSidebar(false);return false;">ido<span>wordless</span></a>
+      <button class="sidebar-close" aria-label="Close menu" onclick="toggleSidebar(false)">&times;</button>
+    </div>
+    <div class="sidebar-caption">Explore the marketplace</div>
+    <nav class="sidebar-links">
+      <button onclick="navigateFromSidebar('home')"><span class="side-icon">⌂</span>Home</button>
+      <button onclick="navigateFromSidebar('ebooks')"><span class="side-icon">📚</span>E-books</button>
+      <button onclick="navigateFromSidebar('services')"><span class="side-icon">✍️</span>Writing services</button>
+      <button onclick="navigateFromSidebar('sell')"><span class="side-icon">＋</span>Start selling</button>
+      <button onclick="navigateFromSidebar('dashboard')"><span class="side-icon">▦</span>Dashboard</button>
+    </nav>
+    <div class="sidebar-note">A marketplace built around the power of words. Read, create and earn with idowordless.</div>
+  </aside>
+
+  <main id="app">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">Your words have value</div>
+          <h1>Where words find their worth.</h1>
+          <p>
+            Discover ebooks, connect with talented writers, and turn your
+            creativity into income. One marketplace. Endless possibilities.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn" onclick="showPage('ebooks')">Explore ebooks</button>
+            <button class="btn btn-outline" onclick="showPage('sell')">Become a seller</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="section-heading">
+        <div>
+          <h2>Explore idowordless</h2>
+          <p>Find the words, skills and stories you're looking for.</p>
+        </div>
+      </div>
+
+      <div class="category-grid">
+        <button class="category" onclick="showPage('ebooks')">
+          <div class="emoji">📖</div>
+          <h3>Discover ebooks</h3>
+          <p>Explore stories, guides, educational material and more.</p>
+        </button>
+        <button class="category" onclick="showPage('services')">
+          <div class="emoji">✍️</div>
+          <h3>Hire a writer</h3>
+          <p>Find people offering writing, editing and creative services.</p>
+        </button>
+        <button class="category" onclick="showPage('sell')">
+          <div class="emoji">🚀</div>
+          <h3>Sell your work</h3>
+          <p>Publish your ebooks or offer your writing skills.</p>
+        </button>
+      </div>
+
+      <div class="section-heading">
+        <div>
+          <h2>Recently added</h2>
+          <p>Explore the latest work published on the marketplace.</p>
+        </div>
+        <button class="text-link" onclick="showPage('ebooks')">Explore all →</button>
+      </div>
+      <div class="listing-grid" id="homeListings">
+        <div class="empty">Connect your Firebase project to load marketplace listings.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="logo" style="color:white;">ido<span>wordless</span></div>
+        <p>A marketplace built around the power of words.</p>
+      </div>
+      <div>
+        <strong>Explore</strong>
+        <p><a href="#" onclick="showPage('ebooks');return false;">Ebooks</a></p>
+        <p><a href="#" onclick="showPage('services');return false;">Writing services</a></p>
+        <p><a href="#" onclick="showPage('sell');return false;">Become a seller</a></p>
+      </div>
+      <div>
+        <strong>Account</strong>
+        <p><a href="#" onclick="openAuth('login');return false;">Log in</a></p>
+        <p><a href="#" onclick="openAuth('signup');return false;">Create account</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Authentication modal -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal">
+      <button class="close" onclick="closeModal('authModal')">&times;</button>
+      <h2 id="authTitle">Welcome back</h2>
+      <p class="page-subtitle" id="authSubtitle">Log in to your idowordless account.</p>
+      <div id="authNotice" class="notice"></div>
+
+      <form id="authForm">
+        <div class="field" id="nameField" hidden>
+          <label for="authName">Your name</label>
+          <input id="authName" type="text" autocomplete="name" placeholder="Enter your name">
+        </div>
+        <div class="field">
+          <label for="authEmail">Email address</label>
+          <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+        </div>
+        <div class="field">
+          <label for="authPassword">Password</label>
+          <input id="authPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="At least 6 characters">
+        </div>
+        <button class="btn" id="authSubmit" type="submit" style="width:100%">Log in</button>
+      </form>
+      <p style="font-size:14px;margin-top:18px;">
+        <span id="switchText">Don't have an account?</span>
+        <button class="modal-switch" id="switchAuth" onclick="switchAuthMode()">Create one</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- Listing detail modal -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal">
+      <button class="close" onclick="closeModal('detailModal')">&times;</button>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      signOut, onAuthStateChanged, updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore, collection, addDoc, getDocs, query, where,
+      orderBy, limit, doc, setDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    /*
+      IMPORTANT:
+      Replace these placeholder values with your Firebase project configuration.
+      Firebase Console -> Project settings -> Your apps -> SDK setup.
+    */
+    const firebaseConfig = {
+  apiKey: "AIzaSyBJCNQqdmyl6vVR8NDegFZh__W6cgQUg08",
+  authDomain: "idowordless.firebaseapp.com",
+  projectId: "idowordless",
+  storageBucket: "idowordless.firebasestorage.app",
+  messagingSenderId: "592854672654",
+  appId: "1:592854672654:web:6fb244534cd6a81c2e235f",
+  measurementId: "G-6DPVDL99K0"
+};
+
+    let auth = null;
+    let db = null;
+    let currentUser = null;
+    let listings = [];
+    let authMode = "login";
+    let firebaseReady = false;
+
+    const appElement = document.getElementById("app");
+
+    function escapeHTML(value = "") {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#039;"
+      })[char]);
+    }
+
+    function money(value) {
+      const amount = Number(value);
+      return Number.isFinite(amount) ? "KSh " + amount.toLocaleString("en-KE") : "Contact seller";
+    }
+
+    function showNotice(id, message, type = "error") {
+      const element = document.getElementById(id);
+      element.textContent = message;
+      element.className = "notice " + type;
+    }
+
+    function clearNotice(id) {
+      const element = document.getElementById(id);
+      element.textContent = "";
+      element.className = "notice";
+    }
+
+    function firebaseConfigured() {
+      return firebaseConfig.apiKey !== "YOUR_API_KEY" &&
+             firebaseConfig.projectId !== "YOUR_PROJECT_ID";
+    }
+
+    if (firebaseConfigured()) {
+      try {
+        const firebaseApp = initializeApp(firebaseConfig);
+        auth = getAuth(firebaseApp);
+        db = getFirestore(firebaseApp);
+        firebaseReady = true;
+
+        onAuthStateChanged(auth, async user => {
+          currentUser = user;
+          updateAccountButtons();
+          if (user) await loadListings();
+        });
+        await loadListings();
+      } catch (error) {
+        console.error("Firebase setup error:", error);
+      }
+    } else {
+      document.getElementById("homeListings").innerHTML =
+        '<div class="empty">Your website is ready for its Firebase connection. Add your Firebase configuration to activate accounts and marketplace listings.</div>';
+    }
+
+    function updateAccountButtons() {
+      document.getElementById("loginButton").hidden = !!currentUser;
+      document.getElementById("signupButton").hidden = !!currentUser;
+      document.getElementById("logoutButton").hidden = !currentUser;
+      const greeting = document.getElementById("accountGreeting");
+      if (currentUser) {
+        const displayName = currentUser.displayName || (currentUser.email ? currentUser.email.split("@")[0] : "Writer");
+        greeting.textContent = "Hello, " + displayName;
+        greeting.hidden = false;
+      } else {
+        greeting.textContent = "";
+        greeting.hidden = true;
+      }
+    }
+
+    window.toggleSidebar = function(open) {
+      const sidebar = document.getElementById("siteSidebar");
+      const backdrop = document.getElementById("sidebarBackdrop");
+      const trigger = document.getElementById("menuTrigger");
+      sidebar.classList.toggle("open", open);
+      backdrop.classList.toggle("open", open);
+      sidebar.setAttribute("aria-hidden", String(!open));
+      trigger.setAttribute("aria-expanded", String(open));
+      document.body.style.overflow = open ? "hidden" : "";
+    };
+
+    window.navigateFromSidebar = function(page) {
+      toggleSidebar(false);
+      showPage(page);
+    };
+
+    window.showPage = async function(page) {
+      if (page === "home") {
+        location.hash = "";
+        renderHome();
+        return;
+      }
+      location.hash = page;
+
+      if (page === "ebooks" || page === "services") {
+        await loadListings();
+        renderMarketplace(page);
+      } else if (page === "sell") {
+        renderSellPage();
+      } else if (page === "dashboard") {
+        renderDashboard();
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    function renderHome() {
+      appElement.innerHTML = `
+        <section class="hero">
+          <div class="hero-inner">
+            <div>
+              <div class="eyebrow">Your words have value</div>
+              <h1>Where words find their worth.</h1>
+              <p>Discover ebooks, connect with talented writers, and turn your creativity into income. One marketplace. Endless possibilities.</p>
+              <div class="hero-buttons">
+                <button class="btn" onclick="showPage('ebooks')">Explore ebooks</button>
+                <button class="btn btn-outline" onclick="showPage('sell')">Become a seller</button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <div class="container">
+          <div class="section-heading"><div><h2>Explore idowordless</h2><p>Find the words, skills and stories you're looking for.</p></div></div>
+          <div class="category-grid">
+            <button class="category" onclick="showPage('ebooks')"><div class="emoji">📖</div><h3>Discover ebooks</h3><p>Explore stories, guides, educational material and more.</p></button>
+            <button class="category" onclick="showPage('services')"><div class="emoji">✍️</div><h3>Hire a writer</h3><p>Find people offering writing, editing and creative services.</p></button>
+            <button class="category" onclick="showPage('sell')"><div class="emoji">🚀</div><h3>Sell your work</h3><p>Publish your ebooks or offer your writing skills.</p></button>
+          </div>
+          <div class="section-heading"><div><h2>Recently added</h2><p>Explore the latest work published on the marketplace.</p></div><button class="text-link" onclick="showPage('ebooks')">Explore all →</button></div>
+          <div class="listing-grid" id="homeListings"></div>
+        </div>`;
+      renderListingCards(listings.slice(0, 6), "homeListings");
+    }
+
+    async function loadListings() {
+      if (!firebaseReady) return;
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, "listings"), orderBy("createdAt", "desc"), limit(60))
+        );
+        listings = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+        const homeContainer = document.getElementById("homeListings");
+        if (homeContainer) renderListingCards(listings.slice(0, 6), "homeListings");
+      } catch (error) {
+        console.error("Could not load listings:", error);
+      }
+    }
+
+    function renderListingCards(items, targetId) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+
+      if (!items.length) {
+        target.innerHTML = '<div class="empty">No listings yet. Be the first to publish your work.</div>';
+        return;
+      }
+
+      target.innerHTML = items.map(item => `
+        <article class="listing-card">
+          <div class="cover">
+            ${item.coverUrl
+              ? `<img src="${escapeHTML(item.coverUrl)}" alt="Cover for ${escapeHTML(item.title)}" onerror="this.style.display='none'">`
+              : (item.type === "ebook" ? "📘" : "✍️")}
+          </div>
+          <div class="listing-content">
+            <span class="tag">${escapeHTML(item.type || "listing")}</span>
+            <h3>${escapeHTML(item.title || "Untitled")}</h3>
+            <div class="byline">By ${escapeHTML(item.sellerName || "A writer")}</div>
+            <p>${escapeHTML((item.description || "").slice(0, 105))}${(item.description || "").length > 105 ? "..." : ""}</p>
+            <div class="listing-bottom">
+              <span class="price">${money(item.price)}</span>
+              <button class="btn btn-small" onclick="openListing('${escapeHTML(item.id)}')">View details</button>
+            </div>
+          </div>
+        </article>`).join("");
+    }
+
+    function renderMarketplace(type) {
+      const isEbook = type === "ebooks";
+      const title = isEbook ? "Discover ebooks" : "Writing services";
+      const description = isEbook
+        ? "Find stories, knowledge and ideas from independent writers."
+        : "Connect with writers offering professional creative services.";
+
+      appElement.innerHTML = `
+        <div class="container">
+          <h1 class="page-title">${title}</h1>
+          <p class="page-subtitle">${description}</p>
+          <div class="toolbar">
+            <input id="searchListings" type="search" placeholder="Search by title or writer...">
+            <select id="categoryFilter">
+              <option value="">All categories</option>
+              <option>Fiction</option><option>Education</option><option>Business</option>
+              <option>Poetry</option><option>Editing</option><option>Copywriting</option>
+              <option>Academic</option><option>Other</option>
+            </select>
+          </div>
+          <div class="listing-grid" id="marketplaceListings"></div>
+        </div>`;
+
+      const filtered = listings.filter(item => item.type === (isEbook ? "ebook" : "service"));
+      renderListingCards(filtered, "marketplaceListings");
+
+      document.getElementById("searchListings").addEventListener("input", filterMarketplace);
+      document.getElementById("categoryFilter").addEventListener("change", filterMarketplace);
+
+      function filterMarketplace() {
+        const term = document.getElementById("searchListings").value.toLowerCase();
+        const category = document.getElementById("categoryFilter").value;
+        const results = filtered.filter(item =>
+          `${item.title || ""} ${item.sellerName || ""} ${item.description || ""}`.toLowerCase().includes(term) &&
+          (!category || item.category === category)
+        );
+        renderListingCards(results, "marketplaceListings");
+      }
+    }
+
+    window.openListing = function(id) {
+      const item = listings.find(listing => listing.id === id);
+      if (!item) return;
+
+      document.getElementById("detailContent").innerHTML = `
+        <div class="detail-cover">
+          ${item.coverUrl
+            ? `<img src="${escapeHTML(item.coverUrl)}" alt="Cover image">`
+            : (item.type === "ebook" ? "📘" : "✍️")}
+        </div>
+        <span class="tag">${escapeHTML(item.type || "listing")}</span>
+        <h2>${escapeHTML(item.title || "Untitled")}</h2>
+        <div class="byline">By ${escapeHTML(item.sellerName || "A writer")}</div>
+        <p class="detail-description">${escapeHTML(item.description || "No description provided.")}</p>
+        <p class="price" style="font-size:22px">${money(item.price)}</p>
+        ${item.type === "service"
+          ? '<p class="hint">Contact and order arrangements will be added with the secure order system.</p>'
+          : '<p class="hint">Secure ebook purchasing and reading will be enabled when the payment and delivery system is connected.</p>'}
+        <button class="btn" style="width:100%" onclick="alert('Purchases and orders will be activated in the payment setup stage.')">
+          ${item.type === "ebook" ? "Buy ebook" : "Request this service"}
+        </button>`;
+      document.getElementById("detailModal").classList.add("show");
+    };
+
+    function renderSellPage() {
+      appElement.innerHTML = `
+        <div class="container">
+          <h1 class="page-title">Put your work out there.</h1>
+          <p class="page-subtitle">Publish an ebook or offer a writing service to the idowordless community.</p>
+          ${!currentUser ? `
+            <div class="panel">
+              <h3>First, create your seller account.</h3>
+              <p class="page-subtitle">You need to log in before publishing a listing.</p>
+              <button class="btn" onclick="openAuth('signup')">Create an account</button>
+              <button class="btn btn-outline" onclick="openAuth('login')">Log in</button>
+            </div>` : `
+            <div class="panel">
+              <h2>Create a listing</h2>
+              <div id="listingNotice" class="notice"></div>
+              <form id="listingForm">
+                <div class="form-grid">
+                  <div class="field">
+                    <label for="listingType">What are you offering?</label>
+                    <select id="listingType" required>
+                      <option value="ebook">An ebook</option>
+                      <option value="service">A writing service</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="listingCategory">Category</label>
+                    <select id="listingCategory" required>
+                      <option>Fiction</option><option>Education</option><option>Business</option>
+                      <option>Poetry</option><option>Editing</option><option>Copywriting</option>
+                      <option>Academic</option><option>Other</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="listingTitle">Title</label>
+                    <input id="listingTitle" required maxlength="90" placeholder="Give your work a clear title">
+                  </div>
+                  <div class="field full">
+                    <label for="listingDescription">Description</label>
+                    <textarea id="listingDescription" required maxlength="1500" placeholder="Tell buyers what makes your work valuable..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="listingPrice">Price (KSh)</label>
+                    <input id="listingPrice" type="number" min="0" step="1" required placeholder="e.g. 500">
+                  </div>
+                  <div class="field">
+                    <label for="listingCover">Cover image URL (optional)</label>
+                    <input id="listingCover" type="url" placeholder="https://...">
+                  </div>
+                </div>
+                <p class="hint">For this first version, you provide a cover image link. Ebook file uploads, buyer payments and delivery will be connected in later stages.</p>
+                <button class="btn" id="publishButton" type="submit">Publish listing</button>
+              </form>
+            </div>`}
+        </div>`;
+
+      const form = document.getElementById("listingForm");
+      if (form) form.addEventListener("submit", publishListing);
+    }
+
+    async function publishListing(event) {
+      event.preventDefault();
+      if (!currentUser || !firebaseReady) {
+        showNotice("listingNotice", "Please connect Firebase and log in first.");
+        return;
+      }
+
+      const button = document.getElementById("publishButton");
+      button.disabled = true;
+      button.textContent = "Publishing...";
+
+      try {
+        const title = document.getElementById("listingTitle").value.trim();
+        const description = document.getElementById("listingDescription").value.trim();
+        const price = Number(document.getElementById("listingPrice").value);
+
+        if (!title || !description || !Number.isFinite(price) || price < 0) {
+          throw new Error("Please check the title, description and price.");
+        }
+
+        await addDoc(collection(db, "listings"), {
+          type: document.getElementById("listingType").value,
+          category: document.getElementById("listingCategory").value,
+          title,
+          description,
+          price,
+          coverUrl: document.getElementById("listingCover").value.trim(),
+          sellerId: currentUser.uid,
+          sellerName: currentUser.displayName || currentUser.email,
+          createdAt: serverTimestamp(),
+          status: "published"
+        });
+
+        await loadListings();
+        showNotice("listingNotice", "Your listing has been published.", "success");
+        formResetAfterPublish();
+      } catch (error) {
+        showNotice("listingNotice", error.message || "Could not publish your listing.");
+      } finally {
+        button.disabled = false;
+        button.textContent = "Publish listing";
+      }
+    }
+
+    function formResetAfterPublish() {
+      const form = document.getElementById("listingForm");
+      if (form) form.reset();
+    }
+
+    async function renderDashboard() {
+      if (!currentUser) {
+        appElement.innerHTML = `
+          <div class="container">
+            <h1 class="page-title">Your dashboard</h1>
+            <div class="panel">
+              <p>Log in to view your account and manage your listings.</p>
+              <button class="btn" onclick="openAuth('login')">Log in</button>
+            </div>
+          </div>`;
+        return;
+      }
+
+      await loadListings();
+      const mine = listings.filter(item => item.sellerId === currentUser.uid);
+
+      appElement.innerHTML = `
+        <div class="container">
+          <h1 class="page-title">Welcome, ${escapeHTML(currentUser.displayName || "Writer")}.</h1>
+          <p class="page-subtitle">Manage your idowordless activity here.</p>
+          <div class="dashboard-stats">
+            <div class="stat"><span>Your listings</span><strong>${mine.length}</strong></div>
+            <div class="stat"><span>Account</span><strong style="font-size:17px">Active</strong></div>
+            <div class="stat"><span>Sales</span><strong>—</strong></div>
+          </div>
+          <div class="section-heading">
+            <div><h2>Your listings</h2><p>Your published ebooks and services.</p></div>
+            <button class="btn btn-small" onclick="showPage('sell')">+ Add listing</button>
+          </div>
+          <div class="listing-grid" id="myListings"></div>
+          <div class="panel" style="margin-top:22px">
+            <h3 style="margin-top:0">Seller payment policy</h3>
+            <p class="page-subtitle">idowordless plans to charge a 10% commission on completed sales. Seller withdrawals will be requested manually and approved by idowordless before payout.</p>
+            <p class="hint">Payments, commission deductions, withdrawal requests and payouts are not active yet. They will be enabled after a secure payment and backend system is connected.</p>
+          </div>
+          <p class="hint">Sales totals, available earnings, listing editing and order management will appear here as those systems are built.</p>
+        </div>`;
+      renderListingCards(mine, "myListings");
+    }
+
+    window.openAuth = function(mode) {
+      authMode = mode;
+      updateAuthModal();
+      clearNotice("authNotice");
+      document.getElementById("authModal").classList.add("show");
+    };
+
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.remove("show");
+    };
+
+    window.switchAuthMode = function() {
+      authMode = authMode === "login" ? "signup" : "login";
+      clearNotice("authNotice");
+      updateAuthModal();
+    };
+
+    function updateAuthModal() {
+      const signup = authMode === "signup";
+      document.getElementById("authTitle").textContent = signup ? "Join idowordless" : "Welcome back";
+      document.getElementById("authSubtitle").textContent = signup
+        ? "Create an account and become part of the writing community."
+        : "Log in to your idowordless account.";
+      document.getElementById("nameField").hidden = !signup;
+      document.getElementById("authName").required = signup;
+      document.getElementById("authPassword").autocomplete = signup ? "new-password" : "current-password";
+      document.getElementById("authSubmit").textContent = signup ? "Create account" : "Log in";
+      document.getElementById("switchText").textContent = signup ? "Already have an account?" : "Don't have an account?";
+      document.getElementById("switchAuth").textContent = signup ? "Log in" : "Create one";
+    }
+
+    document.getElementById("authForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      clearNotice("authNotice");
+
+      if (!firebaseReady) {
+        showNotice("authNotice", "Firebase is not connected yet. Add your project configuration in the code first.");
+        return;
+      }
+
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+      const name = document.getElementById("authName").value.trim();
+      const button = document.getElementById("authSubmit");
+
+      button.disabled = true;
+      button.textContent = "Please wait...";
+
+      try {
+        if (authMode === "signup") {
+          const result = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(result.user, { displayName: name });
+          await setDoc(doc(db, "users", result.user.uid), {
+            uid: result.user.uid,
+            name,
+            email,
+            createdAt: serverTimestamp()
+          });
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+
+        closeModal("authModal");
+        updateAccountButtons();
+      } catch (error) {
+        let message = error.message;
+        if (error.code === "auth/email-already-in-use") message = "This email already has an account. Please log in.";
+        if (error.code === "auth/invalid-credential") message = "Email or password is incorrect.";
+        if (error.code === "auth/weak-password") message = "Your password must be at least 6 characters.";
+        showNotice("authNotice", message);
+      } finally {
+        button.disabled = false;
+        button.textContent = authMode === "signup" ? "Create account" : "Log in";
+      }
+    });
+
+    window.logout = async function() {
+      if (!auth) return;
+      try {
+        await signOut(auth);
+        currentUser = null;
+        updateAccountButtons();
+        showPage("home");
+      } catch (error) {
+        alert("Could not log out. Please try again.");
+      }
+    };
+
+    // Close a modal when the dark area outside it is tapped.
+    document.querySelectorAll(".modal-backdrop").forEach(backdrop => {
+      backdrop.addEventListener("click", event => {
+        if (event.target === backdrop) backdrop.classList.remove("show");
+      });
+    });
+
+    updateAccountButtons();
+  </script>
+</body>
+</html>
