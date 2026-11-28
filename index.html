@@ -29,14 +29,45 @@ footer{background:var(--d);color:white;padding:30px 20px;margin-top:40px}.foot{m
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,onAuthStateChanged,updateProfile}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import{getFirestore,collection,addDoc,getDocs,query,orderBy,limit,doc,setDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyBJCNQqdmyl6vVR8NDegFZh__W6cgQUg08",authDomain:"idowordless.firebaseapp.com",projectId:"idowordless",storageBucket:"idowordless.firebasestorage.app",messagingSenderId:"592854672654",appId:"1:592854672654:web:6fb244534cd6a81c2e235f",measurementId:"G-6DPVDL99K0"};
+const firebaseConfig={apiKey:"AIzaSyBJCNQqdmyl6vVR8NDegFZh__W6cgQUg08",authDomain:"idowordless.firebaseapp.com",projectId:"idowordless",storageBucket:"idowordless.firebasestorage.app",messagingSenderId:"592854672654",appId:"1:592854672654:web:6fb244534cd6a81c2e235f",measurementId:"G-6DPVDL99K0"};const API_BASE="https://idowordless-api.iankamaupm.workers.dev";
 let auth=null,db=null,user=null,items=[],mode="login",ready=false,profileId=null;const app=document.getElementById("app");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 const cash=n=>Number.isFinite(Number(n))?"KSh "+Number(n).toLocaleString("en-KE"):"Contact seller";
 function notice(id,msg,type="error"){let e=document.getElementById(id);if(e){e.textContent=msg;e.className="notice "+type;}}
 function account(){document.getElementById("loginBtn").hidden=!!user;document.getElementById("signupBtn").hidden=!!user;document.getElementById("logoutBtn").hidden=!user;let g=document.getElementById("greeting");g.hidden=!user;g.textContent=user?"Hello, "+(user.displayName||user.email.split("@")[0]):"";}
 try{const fb=initializeApp(firebaseConfig);auth=getAuth(fb);db=getFirestore(fb);ready=true;onAuthStateChanged(auth,async u=>{user=u;account();if(u)await loadItems();});await loadItems();}catch(e){console.error("Firebase setup:",e);}
-async function loadItems(){if(!ready)return;try{let s=await getDocs(query(collection(db,"listings"),orderBy("createdAt","desc"),limit(60)));items=s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){console.error("Listings:",e);}}
+async function apiRequest(path,options={}){
+  if(!user) throw Error("Please log in first.");
+
+  const token=await user.getIdToken();
+
+  const response=await fetch(API_BASE+path,{
+    ...options,
+    headers:{
+      "Authorization":"Bearer "+token,
+      "Content-Type":"application/json",
+      ...(options.headers||{})
+    },
+    cache:"no-store"
+  });
+
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw Error(data.error||data.message||"Profile service error: "+response.status);
+  }
+
+  return data;
+}
+
+async function readMyProfile(){
+  const result=await apiRequest("/api/profile");
+
+  if(Array.isArray(result)) return result[0]||{};
+
+  return result.profile||result.data||result||{};
+  }
+  async function loadItems(){if(!ready)return;try{let s=await getDocs(query(collection(db,"listings"),orderBy("createdAt","desc"),limit(60)));items=s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){console.error("Listings:",e);}}
 window.toggleSide=open=>{document.getElementById("sidebar").classList.toggle("open",open);document.getElementById("sideback").classList.toggle("open",open);};
 window.nav=p=>{toggleSide(false);showPage(p);};window.closeModal=id=>document.getElementById(id).classList.remove("show");
 window.showPage=async p=>{if(p==="home")home();else if(p==="ebooks"||p==="services"){await loadItems();market(p);}else if(p==="sell")sell();else if(p==="dashboard")await dashboard();else if(p==="library")library();else if(p==="wallet")wallet();else if(p==="profile")profile();location.hash=p==="home"?"":p;window.scrollTo(0,0);};
@@ -48,7 +79,224 @@ window.author=id=>{profileId=id;showPage("profile");};
 function profile(){let mine=items.filter(x=>x.sellerId===profileId);if(!mine.length){app.innerHTML='<div class="container"><div class="panel"><h2>Writer profile</h2><p>No public listings available yet.</p></div></div>';return;}let name=mine.find(x=>x.authorName)?.authorName||mine[0].sellerName||"Writer";app.innerHTML=`<div class="container"><span class="kicker">Writer profile</span><div class="profile"><div class="avatar">${esc(name[0].toUpperCase())}</div><div><h2>${esc(name)}</h2><p class="sub">${mine.length} published listing(s) on idowordless</p></div></div><div class="section"><h2>Published work</h2></div><div class="grid" id="profileItems"></div></div>`;cards(mine,"profileItems");}
 function sell(){app.innerHTML=`<div class="container"><span class="kicker">For creators</span><h1 class="title">Put your work out there.</h1><p class="sub">Publish an ebook or offer a writing service. Your public author name can be different from your account name.</p>${!user?`<div class="panel"><h3>Join the writing community</h3><p>Please log in or create an account before publishing.</p><button class="btn" onclick="openAuth('signup')">Create account</button> <button class="btn outline" onclick="openAuth('login')">Log in</button></div>`:`<div class="panel"><h2>Create a listing</h2><div id="listingNotice" class="notice"></div><form id="listingForm"><div class="formgrid"><div class="field"><label>What are you offering?</label><select id="type"><option value="ebook">Ebook</option><option value="service">Writing service</option></select></div><div class="field"><label>Category</label><select id="cat"><option>Fiction</option><option>Education</option><option>Business</option><option>Poetry</option><option>Editing</option><option>Copywriting</option><option>Academic</option><option>Other</option></select></div><div class="field full"><label>Public author / pen name</label><input id="authorName" required maxlength="60" placeholder="e.g. Future MIK"><span class="hint">This is the public name readers see, separate from your login email.</span></div><div class="field full"><label>Title</label><input id="title" required maxlength="90"></div><div class="field full"><label>Description</label><textarea id="description" required maxlength="1500"></textarea></div><div class="field"><label>Price (KSh)</label><input id="price" type="number" min="1" required></div><div class="field"><label>Cover image URL (optional)</label><input id="cover" type="url" placeholder="https://..."></div></div><div class="warning">This form saves listing details to Firestore. Ebook uploads, payments, online reading and service orders are not active yet. Secure storage and payments will be connected in later stages.</div><button class="btn" id="publish">Publish listing</button></form></div>`}`;let form=document.getElementById("listingForm");if(form)form.onsubmit=publish;}
 async function publish(e){e.preventDefault();if(!user||!ready){notice("listingNotice","Please log in and check Firebase.");return;}let b=document.getElementById("publish");b.disabled=true;b.textContent="Publishing...";try{let title=document.getElementById("title").value.trim(),description=document.getElementById("description").value.trim(),authorName=document.getElementById("authorName").value.trim(),price=Number(document.getElementById("price").value);if(!title||!description||!authorName||!Number.isFinite(price)||price<=0)throw Error("Enter the author name, title, description and a price above zero.");await addDoc(collection(db,"listings"),{type:document.getElementById("type").value,category:document.getElementById("cat").value,title,description,authorName,price,coverUrl:document.getElementById("cover").value.trim(),sellerId:user.uid,sellerName:user.displayName||user.email,createdAt:serverTimestamp(),status:"published"});await loadItems();notice("listingNotice","Your listing has been published.","success");document.getElementById("listingForm").reset();}catch(err){notice("listingNotice",err.message||"Could not publish listing.");}finally{b.disabled=false;b.textContent="Publish listing";}}
-async function dashboard(){if(!user){app.innerHTML='<div class="container"><h1 class="title">Your dashboard</h1><div class="panel">Log in to manage your account.<br><button class="btn" onclick="openAuth(\'login\')">Log in</button></div></div>';return;}await loadItems();let mine=items.filter(x=>x.sellerId===user.uid);app.innerHTML=`<div class="container"><span class="kicker">Your workspace</span><h1 class="title">Welcome, ${esc(user.displayName||"Writer")}.</h1><p class="sub">Your publishing, reading and earning space.</p><div class="stats"><div class="stat"><span>Your listings</span><strong>${mine.length}</strong></div><div class="stat"><span>Reader library</span><strong>0</strong></div><div class="stat"><span>Wallet</span><strong>Coming soon</strong></div></div><div class="dashlinks"><button class="dashlink" onclick="showPage('sell')"><span>＋</span>Publish work<small>List an ebook or writing service.</small></button><button class="dashlink" onclick="showPage('library')"><span>📚</span>My Library<small>Access purchased ebooks.</small></button><button class="dashlink" onclick="showPage('wallet')"><span>◈</span>Wallet & earnings<small>Reader payments and writer earnings.</small></button></div><div class="section"><h2>Your listings</h2><button class="btn small" onclick="showPage('sell')">＋ Add listing</button></div><div class="grid" id="mine"></div><div class="warning">The 10% commission and manual withdrawal approval are agreed platform policies, but no payments, balances, deductions or payouts are active yet.</div></div>`;cards(mine,"mine");}
+async function dashboard(){
+  if(!user){
+    app.innerHTML=`
+      <div class="container">
+        <h1 class="title">Your dashboard</h1>
+        <div class="panel">
+          Log in to manage your account.
+          <br>
+          <button class="btn" onclick="openAuth('login')">Log in</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  await loadItems();
+
+  let mine=items.filter(x=>x.sellerId===user.uid);
+  let profileData={};
+  let profileError="";
+
+  try{
+    profileData=await readMyProfile();
+  }catch(err){
+    profileError=err.message||"Could not load your profile.";
+  }
+
+  app.innerHTML=`
+    <div class="container">
+
+      <span class="kicker">Your workspace</span>
+
+      <h1 class="title">
+        Welcome, ${esc(user.displayName||"Writer")}.
+      </h1>
+
+      <p class="sub">
+        Your publishing, reading and earning space.
+      </p>
+
+      <div class="stats">
+        <div class="stat">
+          <span>Your listings</span>
+          <strong>${mine.length}</strong>
+        </div>
+
+        <div class="stat">
+          <span>Reader library</span>
+          <strong>0</strong>
+        </div>
+
+        <div class="stat">
+          <span>Wallet</span>
+          <strong>Coming soon</strong>
+        </div>
+      </div>
+
+      <div class="dashlinks">
+
+        <button class="dashlink" onclick="showPage('sell')">
+          <span>＋</span>
+          Publish work
+          <small>List an ebook or writing service.</small>
+        </button>
+
+        <button class="dashlink" onclick="showPage('library')">
+          <span>📚</span>
+          My Library
+          <small>Access purchased ebooks.</small>
+        </button>
+
+        <button class="dashlink" onclick="showPage('wallet')">
+          <span>◈</span>
+          Wallet & earnings
+          <small>Deposits, withdrawals and transaction history.</small>
+        </button>
+
+      </div>
+
+      <div class="panel">
+
+        <h2>Your writer profile</h2>
+
+        <p class="sub">
+          Choose how readers see you.
+          Your pen name can be different from your account name.
+        </p>
+
+        <div id="profileNotice"
+             class="notice ${profileError?"error":""}">
+          ${esc(profileError)}
+        </div>
+
+        <form id="profileForm">
+
+          <div class="formgrid">
+
+            <div class="field">
+              <label>Display name</label>
+              <input
+                id="profileDisplayName"
+                maxlength="80"
+                value="${esc(profileData.display_name||user.displayName||"")}"
+                required
+              >
+            </div>
+
+            <div class="field">
+              <label>Public pen name</label>
+              <input
+                id="profilePenName"
+                maxlength="80"
+                value="${esc(profileData.pen_name||"")}"
+                placeholder="e.g. Future MIK"
+              >
+            </div>
+
+            <div class="field full">
+              <label>Short bio</label>
+              <textarea
+                id="profileBio"
+                maxlength="2000"
+                placeholder="Tell readers a little about yourself"
+              >${esc(profileData.bio||"")}</textarea>
+            </div>
+
+            <div class="field full">
+              <label>Avatar image URL (optional)</label>
+              <input
+                id="profileAvatar"
+                type="url"
+                maxlength="500"
+                value="${esc(profileData.avatar_url||"")}"
+                placeholder="https://..."
+              >
+            </div>
+
+          </div>
+
+          <button class="btn" id="saveProfileBtn" type="submit">
+            Save profile
+          </button>
+
+        </form>
+
+        <p class="hint">
+          Your login email is not displayed as your public pen name.
+          Profile changes are saved through the idowordless backend.
+        </p>
+
+      </div>
+
+      <div class="section">
+        <h2>Your listings</h2>
+
+        <button class="btn small" onclick="showPage('sell')">
+          ＋ Add listing
+        </button>
+      </div>
+
+      <div class="grid" id="mine"></div>
+
+      <div class="warning">
+        No payments, balances, deductions or payouts are active yet.
+        The planned fees are 10% on deposits and 10% on withdrawals.
+        Ebook sales have no platform sales commission.
+      </div>
+
+    </div>
+  `;
+
+  cards(mine,"mine");
+
+  const profileForm=document.getElementById("profileForm");
+
+  if(profileForm){
+    profileForm.onsubmit=saveMyProfile;
+  }
+  }async function saveMyProfile(e){
+  e.preventDefault();
+
+  if(!user) return;
+
+  const b=document.getElementById("saveProfileBtn");
+
+  b.disabled=true;
+  b.textContent="Saving...";
+
+  try{
+    await apiRequest("/api/profile",{
+      method:"POST",
+      body:JSON.stringify({
+        display_name:document.getElementById("profileDisplayName").value.trim(),
+        pen_name:document.getElementById("profilePenName").value.trim(),
+        bio:document.getElementById("profileBio").value.trim(),
+        avatar_url:document.getElementById("profileAvatar").value.trim()
+      })
+    });
+
+    notice(
+      "profileNotice",
+      "Your profile has been saved.",
+      "success"
+    );
+
+  }catch(err){
+
+    notice(
+      "profileNotice",
+      err.message||"Could not save your profile."
+    );
+
+  }finally{
+
+    b.disabled=false;
+    b.textContent="Save profile";
+
+  }
+  }
 function library(){app.innerHTML='<div class="container"><span class="kicker">Your reading space</span><h1 class="title">My Library</h1><p class="sub">Your purchased ebooks will live here, ready for online reading or downloading.</p><div class="panel"><div style="font-size:38px">📚</div><h2>Your library is waiting for its first book.</h2><p class="sub">After secure checkout and ebook delivery are connected, purchases will appear here.</p><button class="btn" onclick="showPage(\'ebooks\')">Discover ebooks</button></div><div class="warning">Online reading and downloads are both part of the plan. Neither is active yet because secure file storage and purchasing have not been connected.</div></div>';}
 function wallet(){app.innerHTML='<div class="container"><span class="kicker">Payments and earnings</span><h1 class="title">Your idowordless wallet</h1><p class="sub">One account, two sides of the marketplace: buying creative work and earning from yours.</p><div class="wallet"><p>READER WALLET · AVAILABLE BALANCE</p><div class="balance">Not activated</div><p>Deposit and pay for ebooks or writing services.</p></div><div class="wallet"><p>WRITER WALLET · AVAILABLE EARNINGS</p><div class="balance">Not activated</div><p>Track sales, 10% commission and withdrawal requests.</p></div><div class="warning">Wallet balances, deposits, checkout, commission calculations and manual withdrawals are not active. They require secure backend and payment-provider integration. No real money is held by this page.</div><div class="panel"><h3>Planned transaction split</h3><p class="sub">For a completed KSh 500 sale, the planned allocation is KSh 450 to the writer and KSh 50 platform commission, before separately applicable payment-provider fees.</p></div></div>';}
 window.openAuth=modeIn=>{mode=modeIn;authUI();document.getElementById("authNotice").className="notice";document.getElementById("authModal").classList.add("show");};
